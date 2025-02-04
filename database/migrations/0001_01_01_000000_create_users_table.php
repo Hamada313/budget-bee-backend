@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->uuid(); // in order to prevent users from guessing the ID of another user
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes(); // when deleting a user, the record is not actually deleted from the database    
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
