@@ -8,6 +8,7 @@ use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -20,12 +21,15 @@ class AuthController extends Controller
 
     public function register(Request $request): Response
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|max:255|min:6',
         ]);
 
+        if ($validator->fails()) {
+            return response(['message' => "Invalid Credentials"], 422);
+        }
 
         $credentials = $request->only('email', 'password');
         $user = $this->authService->register($request);
@@ -43,17 +47,18 @@ class AuthController extends Controller
         ], 201);
     }
 
+
     public function login(Request $request): Response
     {
         $user = $this->authService->login($request);
         if ($user === null) {
-            return response(['error' => 'the credentials does not match out records'], 401);
+            return response(['message' => 'The credentials does not match our records'], 401);
         }
 
         $credentials = $request->only(['email', 'password']);
 
         if (! $token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response(['message' => 'Unauthorized'], 401);
         }
 
         return response([
@@ -66,22 +71,25 @@ class AuthController extends Controller
         ], 200);
     }
 
+
+    public function refresh(): Response
+    {
+        return response(['message' =>  'Token has been refreshed', 'results' => ['token' => JWTAuth::refresh(), 'expires_in' => JWTAuth::factory()->getTTL() * 60],], 200);
+    }
     public function otp(): Response
     {
         $user = auth('api')->user();
 
-        $this->authService->otp($user);
+        $otp = $this->authService->otp($user);
 
 
-        return response(['message' => 'Verification code sent'], 200);
+        return response(['message' => 'Verification code sent', 'otp' => $otp], 200);
     }
 
 
     public function verify(Request $request): Response
     {
-        $request->validate([
-            'otp' => 'required|numeric',
-        ]);
+        $request->validate(['otp' => 'required|numeric']);
 
         $user = $this->authService->verify($request, auth('api')->user());
 
@@ -96,6 +104,7 @@ class AuthController extends Controller
         );
     }
 
+
     public function resetOtp(Request $request): Response
     {
         $request->validate([
@@ -109,9 +118,11 @@ class AuthController extends Controller
         return response(['message' => 'Verification code sent'], 200);
     }
 
+
     public function resetPassword(Request $request): Response
     {
         $request->validate([
+            'email' => 'required|email|exists:users,email',
             'otp' => 'required|numeric',
             'password' => 'required|string|min:6|max:255|confirmed',
             'password_confirmation' => 'required|string',
@@ -128,5 +139,11 @@ class AuthController extends Controller
             ],
             200,
         );
+    }
+
+    public function logout(): Response
+    {
+        auth('api')->logout();
+        return response(['message' => 'Logout succefull'], 200);
     }
 }

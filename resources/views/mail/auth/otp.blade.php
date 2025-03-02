@@ -73,7 +73,7 @@
     </div>
     <div class="content">
         <p>Every Expense is tracked</p>
-        <p>Use the OTP below to {{$type == 'verification' ? 'verifiy your account' : 'reset your password'}}. This code is valid for the next 10 minutes:</p>
+        <p>Use the OTP below to {{$type == 'verification' || $type == 'register' ? 'verifiy your account' : 'reset your password'}}. This code is valid for the next 10 minutes:</p>
         <div class="otp">{{ $otp }}</div>
         <a href="{{ $verificationLink }}" class="button">Verify</a>
         <p>If you did not request this, please ignore this email.</p>
