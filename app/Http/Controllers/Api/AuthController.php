@@ -146,4 +146,9 @@ class AuthController extends Controller
         auth('api')->logout();
         return response(['message' => 'Logout succefull'], 200);
     }
+
+    public function currentUser(): Response
+    {
+        return response(['message' => 'Current User Retreived Succefully', 'results' => ['user' => new UserResource(auth('api')->user(),),],], 200);
+    }
 }

@@ -18,6 +18,7 @@ class AccountResource extends JsonResource
             'id' => $this->uuid,  
             'accountName' => $this->name,
             'accountBalance' => $this->balance, 
+            'is_default' => $this->is_default,  
         ];
     }
 }

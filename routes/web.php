@@ -8,7 +8,3 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test',function(){
-    Mail::to('hamadaramadan2004@gmail.com')->send(new OtpMail('1234'));
-    return "Mail Sent";          
-}); 

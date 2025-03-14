@@ -20,13 +20,17 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('/otp', 'otp')->name('api.auth.otp');
         Route::post('/verify', 'verify')->name('api.auth.verify');
         Route::post('/logout', 'logout')->name('api.auth.logout');
+        Route::get('/me', 'currentUser')->name('api.auth.me');
     });
 });
 
 Route::middleware('auth:api')->controller(AccountController::class)->group(function () {
     Route::post('/create-account', 'store')->name('api.account.store');
+    Route::post('/create-default-account', 'storeDefault')->name('api.account.store-default');  
     Route::get('/accounts', 'index')->name('api.account.index');
     Route::get('/account/{uuid}', 'show')->name('api.account.show');
     Route::patch('/account/{uuid}/update', 'update')->name('api.account.update');
     Route::delete('/account/{uuid}/delete', 'delete')->name('api.account.delete');
+    Route::post('/account/{uuid}/set-default', 'setDefault')->name('api.account.set-default');
+    Route::get('/account-default', 'getDefault')->name('api.account.get-default');  
 });

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // you can use $table->text() instead of $table->string() if you want to store more than 255 characters
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->uuid()->index();
